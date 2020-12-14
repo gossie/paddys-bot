@@ -6,10 +6,4 @@ import com.slack.api.bolt.servlet.SlackAppServlet;
 import javax.servlet.annotation.WebServlet;
 
 @WebServlet("/slack/events")
-public class PaddysBotController extends SlackAppServlet {
-
-    PaddysBotController(final App app) {
-        super(app);
-    }
-
-}
+class PaddysBotController(app: App) : SlackAppServlet(app)
