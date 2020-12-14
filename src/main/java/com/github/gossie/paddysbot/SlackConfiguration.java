@@ -12,7 +12,7 @@ public class SlackConfiguration {
         var app = new App();
         app.command("/echo", (req, ctx) -> ctx.ack(req.getPayload().getText()));
         app.command("/question", (req, ctx) -> {
-            ctx.respond(":wave: Currently I'm being implemented :nerd-gesicht:");
+            ctx.respond(":wave: Currently I'm being implemented :nerd_face:");
             return ctx.ack();
         });
         return app;
