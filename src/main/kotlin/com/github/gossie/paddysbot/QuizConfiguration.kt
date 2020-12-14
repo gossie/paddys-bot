@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate
 class QuizConfiguration {
 
     @Bean
-    fun restTemplate() {
+    fun restTemplate(): RestTemplate {
         return RestTemplate()
     }
 
