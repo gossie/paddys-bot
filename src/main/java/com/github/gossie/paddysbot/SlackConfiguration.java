@@ -10,7 +10,7 @@ public class SlackConfiguration {
     @Bean
     public App initSlackApp() {
         var app = new App();
-        app.command("/hello", (req, ctx) -> ctx.ack("What's up?"));
+        app.command("/echo", (req, ctx) -> ctx.ack(req.getPayload().getText()));
         return app;
     }
 
