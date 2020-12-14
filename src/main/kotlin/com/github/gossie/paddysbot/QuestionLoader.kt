@@ -15,7 +15,7 @@ class QuestionLoader(private val restTemplate: RestTemplate,
 
     private fun loadAllQuestions() = categories
         .flatMap { loadQuestions(it) }
-        .filter { it.answer != null }
+        .filter { it.correctAnswer != null }
 
     @Scheduled(cron = "0 59 23 * * *")
     fun loadQuestionsScheduled() {
