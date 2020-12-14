@@ -11,7 +11,7 @@ public class SlackConfiguration {
     public App initSlackApp() {
         var app = new App();
         app.command("/echo", (req, ctx) -> ctx.ack(req.getPayload().getText()));
-        app.command("/question", (req, ctx) -> ctx.ack(req.getPayload().getText()));
+        app.command("/question", (req, ctx) -> ctx.ack("Currently I'm being implemented :nerd-gesicht:"));
         return app;
     }
 
