@@ -40,7 +40,7 @@ class QuestionLoader(private val restTemplate: RestTemplate,
     fun determineRandomQuestion(): Question {
         try {
             lock.readLock().lock()
-            logger.info("seleting ong ot ${allQuestions.size} questions")
+            logger.info("selecting from ${allQuestions.size} questions")
             val randomIndex = (Math.random() * (allQuestions.size - 1)).toInt()
             return allQuestions[randomIndex]
         } finally {
