@@ -1,7 +1,7 @@
-package com.github.gossie.paddysbot;
+package com.github.gossie.paddysbot
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import java.util.UUID;
+import java.util.UUID
 
 data class Question(
     @JsonProperty("id") val id: UUID,
