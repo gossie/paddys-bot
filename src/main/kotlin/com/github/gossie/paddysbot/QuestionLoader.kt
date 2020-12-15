@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 @Component
 class QuestionLoader(private val restTemplate: RestTemplate,
@@ -12,7 +13,8 @@ class QuestionLoader(private val restTemplate: RestTemplate,
 
     private val logger = LoggerFactory.getLogger(QuestionLoader::class.java)
     private val categories = listOf("other", "history", "science", "politics", "geography", "literature", "music", "movies", "sport");
-    private var allQuestions: List<Question> = loadAllQuestions()
+    private val lock = ReentrantReadWriteLock()
+    private val allQuestions: MutableList<Question> = ArrayList(loadAllQuestions())
 
     private fun loadAllQuestions() = categories
         .flatMap { loadQuestions(it) }
@@ -20,7 +22,13 @@ class QuestionLoader(private val restTemplate: RestTemplate,
 
     @Scheduled(cron = "0 59 23 * * *")
     fun loadQuestionsScheduled() {
-        allQuestions = loadAllQuestions()
+        try {
+            lock.writeLock().lock()
+            allQuestions.clear()
+            allQuestions.addAll(loadAllQuestions())
+        } finally {
+            lock.writeLock().unlock()
+        }
     }
 
     fun loadQuestions(category: String): List<Question> {
@@ -30,9 +38,14 @@ class QuestionLoader(private val restTemplate: RestTemplate,
     }
 
     fun determineRandomQuestion(): Question {
-        logger.info("seleting ong ot ${allQuestions.size} questions")
-        val randomIndex = (Math.random() * (allQuestions.size - 1)).toInt()
-        return allQuestions[randomIndex]
+        try {
+            lock.readLock().lock()
+            logger.info("seleting ong ot ${allQuestions.size} questions")
+            val randomIndex = (Math.random() * (allQuestions.size - 1)).toInt()
+            return allQuestions[randomIndex]
+        } finally {
+            lock.readLock().unlock()
+        }
     }
 
 }
