@@ -1,6 +1,7 @@
 package com.github.gossie.paddysbot;
 
 import com.slack.api.bolt.App;
+import com.slack.api.model.block.LayoutBlock
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +16,7 @@ class SlackConfiguration {
             val question = questionLoader.determineRandomQuestion()
             ctx.ack(question.question);
         }
+
         return app;
     }
 

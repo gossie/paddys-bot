@@ -1,5 +1,6 @@
 package com.github.gossie.paddysbot;
 
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -8,9 +9,9 @@ import org.springframework.web.client.RestTemplate;
 @Component
 class QuestionLoader(private val restTemplate: RestTemplate,
                      @Value("\${question.service.url}") private val url: String) {
-					 
-    private val categories = listOf("other", "history", "science", "politics", "geography", "literature", "music", "movies", "sport");
 
+    private val logger = LoggerFactory.getLogger(QuestionLoader::class.java)
+    private val categories = listOf("other", "history", "science", "politics", "geography", "literature", "music", "movies", "sport");
     private var allQuestions: List<Question> = loadAllQuestions()
 
     private fun loadAllQuestions() = categories
@@ -29,6 +30,7 @@ class QuestionLoader(private val restTemplate: RestTemplate,
     }
 
     fun determineRandomQuestion(): Question {
+        logger.debug("seleting ong ot ${allQuestions.size} questions")
         val randomIndex = (Math.random() * (allQuestions.size - 1)).toInt()
         return allQuestions[randomIndex]
     }
