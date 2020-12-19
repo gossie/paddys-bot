@@ -68,7 +68,7 @@ class SlackConfiguration {
             logger.info("req.responseUrl: ${req.responseUrl}")
 
             val data = PrivateMetadata()
-            data.responseUrl = ctx.responseUrl
+            data.responseUrl = req.responseUrl
             data.commandArgument = req.payload.text
 
             logger.info("trigger id: ${ctx.triggerId}")
