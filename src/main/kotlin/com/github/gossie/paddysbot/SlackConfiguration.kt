@@ -61,7 +61,7 @@ class SlackConfiguration {
                         view { thisView ->
                             thisView.callbackId("question")
                                 .type("modal")
-                                .title(viewTitle { it.type("plain_text").text(question.question).emoji(true) })
+                                .title(viewTitle { it.type("plain_text").text("Deine Frage").emoji(true) })
                                 .submit(viewSubmit { it.type("plain_text").text("Submit").emoji(true) })
                                 .close(viewClose { it.type("plain_text").text("Cancel").emoji(true) })
                                 .blocks(
