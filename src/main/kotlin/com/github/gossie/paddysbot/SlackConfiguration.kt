@@ -35,18 +35,10 @@ class SlackConfiguration {
         app.command("/question") { req, ctx ->
             val question = questionLoader.determineRandomQuestion()
 
-            logger.info("ctx.responseUrl: ${ctx.responseUrl}")
-            logger.info("req.responseUrl: ${req.responseUrl}")
-
-            val data = PrivateMetadata()
-            data.responseUrl = req.responseUrl
-            data.commandArgument = req.payload.text
-            data.channelId = req.context.channelId
-
             logger.info("trigger id: ${ctx.triggerId}")
             val viewsOpenRes = ctx.client().viewsOpen { builder ->
                 builder.triggerId(ctx.triggerId)
-                    .view(questionView(question, data))
+                    .view(questionView(question))
             }
 
             logger.info("viewsOpenRes: $viewsOpenRes")
@@ -59,16 +51,20 @@ class SlackConfiguration {
         }
 
         app.viewSubmission("question") { req, ctx ->
-            logger.info("view submission came in")
-            val privateMetadata = JsonOps.fromJson(req.payload.view.privateMetadata, PrivateMetadata::class.java)
-            logger.info("privateMetadata: ${privateMetadata.channelId}")
+            logger.info("view submission came in: ", req.payload)
             ctx.ack { r -> r.responseAction("update").view(ratingView("")) }
+        }
+
+        app.viewSubmission("rating") { _, ctx ->
+            logger.info("view submission came in")
+            val question = questionLoader.determineRandomQuestion()
+            ctx.ack { r -> r.responseAction("update").view(questionView(question)) }
         }
 
         return app
     }
 
-    private fun questionView(question: Question, data: PrivateMetadata): View {
+    private fun questionView(question: Question): View {
         val elements = when {
             question.choices != null -> {
                 input { input ->
@@ -98,9 +94,8 @@ class SlackConfiguration {
             thisView.callbackId("question")
                 .type("modal")
                 .title(viewTitle { it.type("plain_text").text("Deine Frage").emoji(true) })
-                .submit(viewSubmit { it.type("plain_text").text("Submit").emoji(true) })
-                .close(viewClose { it.type("plain_text").text("Cancel").emoji(true) })
-                .privateMetadata(JsonOps.toJsonString(data))
+                .submit(viewSubmit { it.type("plain_text").text("Senden").emoji(true) })
+                .close(viewClose { it.type("plain_text").text("Schließen").emoji(true) })
                 .blocks(
                     listOf(
                         header { it.text(plainText { it.text(question.question) }) },
@@ -112,9 +107,10 @@ class SlackConfiguration {
 
     private fun ratingView(answer: String): View {
         return view { thisView ->
-            thisView.callbackId("question")
+            thisView.callbackId("rating")
                 .type("modal")
                 .title(viewTitle { it.type("plain_text").text("Deine Antwort").emoji(true) })
+                .submit(viewSubmit { it.type("plain_text").text("Noch eine Frage").emoji(true) })
                 .close(viewClose { it.type("plain_text").text("Schließen").emoji(true) })
                 .blocks(
                     listOf(
