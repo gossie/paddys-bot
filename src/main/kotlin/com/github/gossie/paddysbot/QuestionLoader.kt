@@ -19,6 +19,7 @@ class QuestionLoader(private val restTemplate: RestTemplate,
     private fun loadAllQuestions() = categories
         .flatMap { loadQuestions(it) }
         .filter { it.correctAnswer != null }
+        .filter { it.question != "Was besagt das \"Mooresche Gesetz\"?"} // TODO: Länge der Antwort muss gehandled werden
 
     @Scheduled(cron = "0 59 23 * * *")
     fun loadQuestionsScheduled() {
