@@ -1,25 +1,18 @@
 package com.github.gossie.paddysbot
 
-import com.slack.api.Slack
-import com.slack.api.app_backend.views.response.InputBlockResponse
 import com.slack.api.bolt.App
 import com.slack.api.bolt.response.Response
 import com.slack.api.bolt.util.JsonOps
-import com.slack.api.model.ModelConfigurator
-import com.slack.api.model.block.*
-import com.slack.api.model.block.Blocks.*
+import com.slack.api.model.block.Blocks.header
+import com.slack.api.model.block.Blocks.input
 import com.slack.api.model.block.composition.BlockCompositions.option
 import com.slack.api.model.block.composition.BlockCompositions.plainText
-import com.slack.api.model.block.element.*
+import com.slack.api.model.block.element.BlockElements.plainTextInput
+import com.slack.api.model.block.element.BlockElements.staticSelect
 import com.slack.api.model.view.Views.*
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-
-import com.slack.api.model.block.Blocks.section
-import com.slack.api.model.block.SectionBlock.SectionBlockBuilder
-import com.slack.api.model.block.element.BlockElements.*
-import com.slack.api.model.block.element.ConversationsSelectElement.ConversationsSelectElementBuilder
 
 
 internal class PrivateMetadata {
@@ -107,7 +100,7 @@ class SlackConfiguration {
             logger.info("view submission came in")
             val privateMetadata = JsonOps.fromJson(req.payload.view.privateMetadata, PrivateMetadata::class.java)
             logger.info("privateMetadata: ${privateMetadata.channelId}")
-            app.client().chatPostMessage { it.channel(privateMetadata.channelId).text("Ist angekommen") }
+            ctx.respond("Ist angekommen")
             ctx.ack()
         }
 
