@@ -10,6 +10,7 @@ import com.slack.api.model.block.composition.PlainTextObject
 import com.slack.api.model.block.element.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.regex.Pattern
 
 @Configuration
 class SlackConfiguration {
@@ -29,7 +30,7 @@ class SlackConfiguration {
                                 .text(PlainTextObject.builder()
                                     .text(it.choice)
                                     .build())
-                                .actionId(it.id.toString())
+                                .actionId("choice-${it.id}")
                                 //.url("/choice")
                                 .build()
                         }
@@ -45,8 +46,7 @@ class SlackConfiguration {
             }
         }
 
-        app.
-        app.blockAction("choice-action") { req, ctx ->
+        app.blockAction(Pattern.compile("choice-*")) { req, ctx ->
             ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
             ctx.ack()
         }
