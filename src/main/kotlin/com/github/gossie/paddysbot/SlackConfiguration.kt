@@ -9,16 +9,14 @@ import com.slack.api.model.block.Blocks.*
 import com.slack.api.model.block.composition.BlockCompositions.option
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.model.block.element.*
-import com.slack.api.model.block.element.BlockElements.plainTextInput
-import com.slack.api.model.block.element.BlockElements.staticSelect
 import com.slack.api.model.view.Views.*
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import com.slack.api.model.block.element.BlockElements.conversationsSelect
 
 import com.slack.api.model.block.Blocks.section
 import com.slack.api.model.block.SectionBlock.SectionBlockBuilder
+import com.slack.api.model.block.element.BlockElements.*
 import com.slack.api.model.block.element.ConversationsSelectElement.ConversationsSelectElementBuilder
 
 
@@ -87,11 +85,10 @@ class SlackConfiguration {
                                         section { s: SectionBlockBuilder ->
                                             s
                                                 .text(plainText("The channel we'll post the result"))
-                                                .accessory(conversationsSelect { conv ->
+                                                .accessory(channelsSelect { conv ->
                                                     conv
                                                         .actionId("notification_conv_id")
                                                         .responseUrlEnabled(true)
-                                                        .defaultToCurrentConversation(true)
                                                 })
                                         },
                                         header { it.text(plainText { it.text(question.question) }) },
