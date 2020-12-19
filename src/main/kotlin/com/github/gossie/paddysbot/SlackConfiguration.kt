@@ -6,6 +6,7 @@ import com.slack.api.model.block.ActionsBlock
 import com.slack.api.model.block.HeaderBlock
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.RichTextBlock
+import com.slack.api.model.block.composition.DispatchActionConfig
 import com.slack.api.model.block.composition.PlainTextObject
 import com.slack.api.model.block.element.*
 import org.springframework.context.annotation.Bean
@@ -46,6 +47,9 @@ class SlackConfiguration {
                 else -> {
                     val input = listOf(PlainTextInputElement.builder()
                         .actionId("input")
+                        .dispatchActionConfig(DispatchActionConfig.builder()
+                            .triggerActionsOn(listOf("on_enter_pressed"))
+                            .build())
                         .build())
 
                     ctx.ack(
