@@ -5,6 +5,7 @@ import com.slack.api.app_backend.slash_commands.response.SlashCommandResponse
 import com.slack.api.bolt.App
 import com.slack.api.bolt.response.Response
 import com.slack.api.model.block.*
+import com.slack.api.model.block.Blocks.actions
 import com.slack.api.model.block.Blocks.header
 import com.slack.api.model.block.composition.BlockCompositions
 import com.slack.api.model.block.composition.BlockCompositions.plainText
@@ -29,7 +30,7 @@ class SlackConfiguration {
         app.command("/echo") { req, ctx -> ctx.ack(req.payload.text) }
         app.command("/question") { _, ctx ->
             val question = questionLoader.determineRandomQuestion()
-/*
+
             val elements = when {
                 question.choices != null -> {
                     question.choices
@@ -40,7 +41,6 @@ class SlackConfiguration {
                                     .build())
                                 .actionId("choice-${it.id}")
                                 .value(it.choice)
-                                //.url("/choice")
                                 .build()
                         }
                 }
@@ -53,7 +53,7 @@ class SlackConfiguration {
                         .build())
                 }
             }
-*/
+
             logger.info("trigger id: ${ctx.triggerId}")
             val viewsOpenRes = ctx.client().viewsOpen { builder ->
                 builder.triggerId(ctx.triggerId)
@@ -66,7 +66,8 @@ class SlackConfiguration {
                                 .close(viewClose { it.type("plain_text").text("Cancel").emoji(true) })
                                 .blocks(
                                     listOf(
-                                        header { it.text(plainText { it.text(question.question) }) }
+                                        header { it.text(plainText { it.text(question.question) }) },
+                                        actions(elements)
                                     )
                                 )
                         }
