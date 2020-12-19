@@ -84,8 +84,9 @@ class SlackConfiguration {
                                         section { s: SectionBlockBuilder ->
                                             s
                                                 .text(plainText("The channel we'll post the result"))
-                                                .accessory(conversationsSelect { conv: ConversationsSelectElementBuilder ->
+                                                .accessory(conversationsSelect { conv ->
                                                     conv
+                                                        .actionId("notification_conv_id")
                                                         .responseUrlEnabled(true)
                                                         .defaultToCurrentConversation(true)
                                                 })
