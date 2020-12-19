@@ -4,12 +4,14 @@ import com.slack.api.bolt.App
 import com.slack.api.bolt.response.Response
 import com.slack.api.bolt.util.JsonOps
 import com.slack.api.model.block.Blocks.*
+import com.slack.api.model.block.InputBlock
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.composition.BlockCompositions.option
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.model.block.element.BlockElement
 import com.slack.api.model.block.element.BlockElements
 import com.slack.api.model.block.element.BlockElements.*
+import com.slack.api.model.block.element.PlainTextInputElement
 import com.slack.api.model.view.View
 import com.slack.api.model.view.Views.*
 import org.slf4j.LoggerFactory
@@ -51,7 +53,8 @@ class SlackConfiguration {
         }
 
         app.viewSubmission("question") { req, ctx ->
-            logger.info("view submission came in: ", req.payload.view)
+            logger.info("view submission came in: ", req.payload.view.state)
+
             ctx.ack { r -> r.responseAction("update").view(ratingView("")) }
         }
 
@@ -69,6 +72,7 @@ class SlackConfiguration {
             question.choices != null -> {
                 input { input ->
                     input
+                        .blockId("input")
                         .element(staticSelect {
                             it.options(
                                 question.choices
@@ -84,6 +88,7 @@ class SlackConfiguration {
             else -> {
                 input {
                     it
+                        .blockId("input")
                         .element(plainTextInput { pti -> pti.actionId("input") })
                         .label(plainText { pt -> pt.text("Deine Antwort") })
                 }
