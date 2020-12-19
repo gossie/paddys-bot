@@ -53,6 +53,7 @@ class SlackConfiguration {
                             HeaderBlock.builder().text(PlainTextObject.builder().text(question.question).build()).build(),
                             ActionsBlock.builder().elements(input).build()
                         )
+                    )
                 }
             }
         }
