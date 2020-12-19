@@ -5,13 +5,13 @@ import com.slack.api.app_backend.slash_commands.response.SlashCommandResponse
 import com.slack.api.bolt.App
 import com.slack.api.bolt.response.Response
 import com.slack.api.model.block.*
-import com.slack.api.model.block.Blocks.actions
-import com.slack.api.model.block.Blocks.header
+import com.slack.api.model.block.Blocks.*
 import com.slack.api.model.block.composition.BlockCompositions
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.model.block.composition.DispatchActionConfig
 import com.slack.api.model.block.composition.PlainTextObject
 import com.slack.api.model.block.element.*
+import com.slack.api.model.block.element.BlockElements.plainTextInput
 import com.slack.api.model.view.Views
 import com.slack.api.model.view.Views.*
 import org.slf4j.LoggerFactory
@@ -33,24 +33,23 @@ class SlackConfiguration {
 
             val elements = when {
                 question.choices != null -> {
-                    question.choices
-                        .map {
-                            ButtonElement.builder()
-                                .text(PlainTextObject.builder()
-                                    .text(it.choice)
-                                    .build())
-                                .actionId("choice-${it.id}")
-                                .value(it.choice)
-                                .build()
-                        }
+                    actions(
+                        question.choices
+                            .map {
+                                ButtonElement.builder()
+                                    .text(PlainTextObject.builder()
+                                        .text(it.choice)
+                                        .build())
+                                    .actionId("choice-${it.id}")
+                                    .value(it.choice)
+                                    .build()
+                            }
+                    )
                 }
                 else -> {
-                    listOf(PlainTextInputElement.builder()
-                        .actionId("input")
-                        .dispatchActionConfig(DispatchActionConfig.builder()
-                            .triggerActionsOn(listOf("on_enter_pressed"))
-                            .build())
-                        .build())
+                    input {
+                        it.element(plainTextInput { pti -> pti.actionId("input") })
+                    }
                 }
             }
 
@@ -67,7 +66,7 @@ class SlackConfiguration {
                                 .blocks(
                                     listOf(
                                         header { it.text(plainText { it.text(question.question) }) },
-                                        actions(elements)
+                                        elements
                                     )
                                 )
                         }
@@ -84,11 +83,13 @@ class SlackConfiguration {
         }
 
         app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
+            logger.info("choice came in: $req")
             ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
             ctx.ack()
         }
 
         app.blockAction("input") { req, ctx ->
+            logger.info("input came in: $req")
             ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
             ctx.ack()
         }
