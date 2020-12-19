@@ -3,6 +3,7 @@ package com.github.gossie.paddysbot
 import com.slack.api.app_backend.interactive_components.response.ActionResponse
 import com.slack.api.app_backend.slash_commands.response.SlashCommandResponse
 import com.slack.api.bolt.App
+import com.slack.api.bolt.response.Response
 import com.slack.api.model.block.*
 import com.slack.api.model.block.Blocks.header
 import com.slack.api.model.block.composition.BlockCompositions
@@ -50,7 +51,7 @@ class SlackConfiguration {
                 }
             }
 */
-            ctx.client().viewsOpen { builder ->
+            val viewsOpenRes = ctx.client().viewsOpen { builder ->
                 builder.triggerId(ctx.triggerId)
                     .view(
                         view { thisView ->
@@ -68,7 +69,11 @@ class SlackConfiguration {
                     )
             }
 
-            ctx.ack()
+            if (viewsOpenRes.isOk) {
+                ctx.ack()
+            } else {
+                Response.builder().statusCode(500).body(viewsOpenRes.error).build()
+            }
         }
 
         app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
