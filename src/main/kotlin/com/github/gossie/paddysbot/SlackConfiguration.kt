@@ -46,7 +46,7 @@ class SlackConfiguration {
             }
         }
 
-        app.blockAction(Pattern.compile("choice-\\w*-\\w-\\w-\\w-\\w")) { req, ctx ->
+        app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
             ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
             ctx.ack()
         }
