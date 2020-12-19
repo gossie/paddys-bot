@@ -7,11 +7,14 @@ import com.slack.api.bolt.response.Response
 import com.slack.api.model.block.*
 import com.slack.api.model.block.Blocks.*
 import com.slack.api.model.block.composition.BlockCompositions
+import com.slack.api.model.block.composition.BlockCompositions.option
 import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.model.block.composition.DispatchActionConfig
 import com.slack.api.model.block.composition.PlainTextObject
+import com.slack.api.model.block.composition.TextObject
 import com.slack.api.model.block.element.*
 import com.slack.api.model.block.element.BlockElements.plainTextInput
+import com.slack.api.model.block.element.BlockElements.staticSelect
 import com.slack.api.model.view.Views
 import com.slack.api.model.view.Views.*
 import org.slf4j.LoggerFactory
@@ -33,18 +36,18 @@ class SlackConfiguration {
 
             val elements = when {
                 question.choices != null -> {
-                    actions(
-                        question.choices
-                            .map {
-                                ButtonElement.builder()
-                                    .text(PlainTextObject.builder()
-                                        .text(it.choice)
-                                        .build())
-                                    .actionId("choice-${it.id}")
-                                    .value(it.choice)
-                                    .build()
-                            }
-                    )
+                    input { input ->
+                        input
+                            .element(staticSelect {
+                                it.options(
+                                    question.choices
+                                        .map {
+                                            option { oo -> oo.text(plainText(it.choice)).value(it.choice) }
+                                        }
+                                )
+                            })
+                            .label(plainText { pt -> pt.text("Deine Antwort") })
+                    }
                 }
                 else -> {
                     input {
