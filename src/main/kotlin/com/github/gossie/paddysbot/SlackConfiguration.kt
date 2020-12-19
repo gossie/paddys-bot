@@ -51,7 +51,7 @@ class SlackConfiguration {
         }
 
         app.viewSubmission("question") { req, ctx ->
-            logger.info("view submission came in: ", req.payload)
+            logger.info("view submission came in: ", req.payload.view)
             ctx.ack { r -> r.responseAction("update").view(ratingView("")) }
         }
 
