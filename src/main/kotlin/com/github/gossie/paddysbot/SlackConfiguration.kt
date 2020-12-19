@@ -87,22 +87,9 @@ class SlackConfiguration {
             }
         }
 
-        app.viewSubmission("question") { req, ctx ->
+        app.viewSubmission("question") { _, ctx ->
+            logger.info("view submission came in")
             ctx.respond("Ist angekommen")
-            ctx.ack()
-        }
-
-        app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
-            logger.info("choice came in, req: $req")
-            logger.info("choice came in, req.payload: ${req.payload}")
-            logger.info("choice came in, req.payload.actions[0]: ${req.payload.actions[0]}")
-            ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
-            ctx.ack()
-        }
-
-        app.blockAction("input") { req, ctx ->
-            logger.info("input came in: $req")
-            ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
             ctx.ack()
         }
 
