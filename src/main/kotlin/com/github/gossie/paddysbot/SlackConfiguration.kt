@@ -48,7 +48,9 @@ class SlackConfiguration {
                 }
                 else -> {
                     input {
-                        it.element(plainTextInput { pti -> pti.actionId("input") })
+                        it
+                            .element(plainTextInput { pti -> pti.actionId("input") })
+                            .label(plainText { pt -> pt.text("Deine Antwort") })
                     }
                 }
             }
@@ -83,7 +85,9 @@ class SlackConfiguration {
         }
 
         app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
-            logger.info("choice came in: $req")
+            logger.info("choice came in, req: $req")
+            logger.info("choice came in, req.payload: ${req.payload}")
+            logger.info("choice came in, req.payload.actions[0]: ${req.payload.actions[0]}")
             ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
             ctx.ack()
         }
