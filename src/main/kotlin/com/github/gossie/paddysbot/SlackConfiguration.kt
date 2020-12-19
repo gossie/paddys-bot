@@ -106,7 +106,7 @@ class SlackConfiguration {
         app.viewSubmission("question") { req, ctx ->
             logger.info("view submission came in")
             val privateMetadata = JsonOps.fromJson(req.payload.view.privateMetadata, PrivateMetadata::class.java)
-            logger.info("privateMetadata: $privateMetadata")
+            logger.info("privateMetadata: ${privateMetadata.channelId}")
             app.client().chatPostMessage { it.channel(privateMetadata.channelId).text("Ist angekommen") }
             ctx.ack()
         }
