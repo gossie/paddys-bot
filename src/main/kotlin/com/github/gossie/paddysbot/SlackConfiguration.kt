@@ -53,13 +53,15 @@ class SlackConfiguration {
         }
 
         app.viewSubmission("question") { req, ctx ->
-            logger.info("view submission came in: ", req.payload.view.state.values["input"]?.get("input")?.value)
+            logger.info("question view submission came in")
 
-            ctx.ack { r -> r.responseAction("update").view(ratingView(req.payload.view.state.values["input"]?.get("input")?.value)) }
+            val answer = req.payload.view.state.values["input"]?.values?.map { it.value }.firstOrNull()
+
+            ctx.ack { r -> r.responseAction("update").view(ratingView(answer)) }
         }
 
         app.viewSubmission("rating") { _, ctx ->
-            logger.info("view submission came in")
+            logger.info("rating view submission came in")
             val question = questionLoader.determineRandomQuestion()
             ctx.ack { r -> r.responseAction("update").view(questionView(question)) }
         }
