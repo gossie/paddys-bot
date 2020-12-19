@@ -64,9 +64,12 @@ class SlackConfiguration {
                 }
             }
 
+            logger.info("ctx.responseUrl: ${ctx.responseUrl}")
+            logger.info("req.responseUrl: ${req.responseUrl}")
+
             val data = PrivateMetadata()
             data.responseUrl = ctx.responseUrl
-            data.commandArgument = req.getPayload().getText()
+            data.commandArgument = req.payload.text
 
             logger.info("trigger id: ${ctx.triggerId}")
             val viewsOpenRes = ctx.client().viewsOpen { builder ->
