@@ -13,12 +13,15 @@ import com.slack.api.model.block.composition.PlainTextObject
 import com.slack.api.model.block.element.*
 import com.slack.api.model.view.Views
 import com.slack.api.model.view.Views.*
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.regex.Pattern
 
 @Configuration
 class SlackConfiguration {
+
+    private val logger = LoggerFactory.getLogger(SlackConfiguration::class.java)
 
     @Bean
     fun initSlackApp(questionLoader: QuestionLoader): App {
@@ -51,6 +54,7 @@ class SlackConfiguration {
                 }
             }
 */
+            logger.info("trigger id: ${ctx.triggerId}")
             val viewsOpenRes = ctx.client().viewsOpen { builder ->
                 builder.triggerId(ctx.triggerId)
                     .view(
@@ -68,6 +72,8 @@ class SlackConfiguration {
                         }
                     )
             }
+
+            logger.info("viewsOpenRes: $viewsOpenRes")
 
             if (viewsOpenRes.isOk) {
                 ctx.ack()
