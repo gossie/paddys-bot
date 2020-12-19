@@ -25,6 +25,7 @@ import com.slack.api.model.block.element.ConversationsSelectElement.Conversation
 internal class PrivateMetadata {
     var responseUrl: String? = null
     var commandArgument: String? = null
+    var channelId: String? = null
 }
 
 @Configuration
@@ -70,6 +71,7 @@ class SlackConfiguration {
             val data = PrivateMetadata()
             data.responseUrl = req.responseUrl
             data.commandArgument = req.payload.text
+            data.channelId = req.context.channelId
 
             logger.info("trigger id: ${ctx.triggerId}")
             val viewsOpenRes = ctx.client().viewsOpen { builder ->
@@ -104,7 +106,7 @@ class SlackConfiguration {
         app.viewSubmission("question") { req, ctx ->
             logger.info("view submission came in")
             val privateMetadata = JsonOps.fromJson(req.payload.view.privateMetadata, PrivateMetadata::class.java)
-            Slack.getInstance().send(privateMetadata.responseUrl, "Ist angekomment")
+            app.client().chatPostMessage { it.channel(privateMetadata.channelId).text("Ist angekommen") }
             ctx.ack()
         }
 
