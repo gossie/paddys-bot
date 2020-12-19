@@ -4,10 +4,9 @@ import com.slack.api.app_backend.slash_commands.response.SlashCommandResponse
 import com.slack.api.bolt.App
 import com.slack.api.model.block.ActionsBlock
 import com.slack.api.model.block.LayoutBlock
+import com.slack.api.model.block.RichTextBlock
 import com.slack.api.model.block.composition.PlainTextObject
-import com.slack.api.model.block.element.BlockElement
-import com.slack.api.model.block.element.BlockElements
-import com.slack.api.model.block.element.ButtonElement
+import com.slack.api.model.block.element.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -32,9 +31,35 @@ class SlackConfiguration {
                                 .build()
                         }
 
-                    ctx.ack(listOf(ActionsBlock.builder()
-                        .elements(choiceElements)
-                        .build()))
+                    ctx.ack(
+                        listOf(
+                            RichTextBlock
+                                .builder()
+                                .elements(
+                                    listOf(
+                                        BlockElements
+                                            .richTextSection {
+                                                it.elements(
+                                                    listOf(RichTextSectionElement
+                                                        .builder()
+                                                        .elements(
+                                                            listOf(
+                                                                RichTextSectionElement.Text
+                                                                    .builder()
+                                                                    .text(question.question)
+                                                                    .build()
+                                                            )
+                                                        )
+                                                        .build()
+                                                    )
+                                                )
+                                            }
+                                    )
+                                )
+                                .build(),
+                            ActionsBlock.builder().elements(choiceElements).build()
+                        )
+                    )
                 }
                 else -> ctx.ack(question.question)
             }
