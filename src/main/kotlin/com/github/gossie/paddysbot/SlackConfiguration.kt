@@ -87,6 +87,10 @@ class SlackConfiguration {
             }
         }
 
+        app.viewSubmission("question") { req, ctx ->
+            ctx.ack()
+        }
+
         app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
             logger.info("choice came in, req: $req")
             logger.info("choice came in, req.payload: ${req.payload}")
