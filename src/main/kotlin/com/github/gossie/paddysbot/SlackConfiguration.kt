@@ -44,9 +44,9 @@ class SlackConfiguration {
                     )
                 }
                 else -> {
-                    val input = PlainTextInputElement.builder()
+                    val input = listOf(PlainTextInputElement.builder()
                         .actionId("input")
-                        .build()
+                        .build())
 
                     ctx.ack(
                         listOf(
