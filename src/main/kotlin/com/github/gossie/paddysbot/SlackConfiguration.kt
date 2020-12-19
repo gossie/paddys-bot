@@ -29,7 +29,7 @@ class SlackConfiguration {
                                 .text(PlainTextObject.builder()
                                     .text(it.choice)
                                     .build())
-                                .actionId(it.id.toString())
+                                .actionId("choice-action")
                                 //.url("/choice")
                                 .build()
                         }
@@ -43,6 +43,11 @@ class SlackConfiguration {
                 }
                 else -> ctx.ack(question.question)
             }
+        }
+
+        app.blockAction("choice-action") { req, ctx ->
+            ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
+            ctx.ack()
         }
 
         return app;
