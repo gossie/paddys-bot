@@ -3,6 +3,7 @@ package com.github.gossie.paddysbot
 import com.slack.api.bolt.App
 import com.slack.api.bolt.response.Response
 import com.slack.api.bolt.util.JsonOps
+import com.slack.api.model.ModelConfigurator
 import com.slack.api.model.block.*
 import com.slack.api.model.block.Blocks.*
 import com.slack.api.model.block.composition.BlockCompositions.option
@@ -14,6 +15,12 @@ import com.slack.api.model.view.Views.*
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import com.slack.api.model.block.element.BlockElements.conversationsSelect
+
+import com.slack.api.model.block.Blocks.section
+import com.slack.api.model.block.SectionBlock.SectionBlockBuilder
+import com.slack.api.model.block.element.ConversationsSelectElement.ConversationsSelectElementBuilder
+
 
 internal class PrivateMetadata {
     var responseUrl: String? = null
@@ -74,6 +81,15 @@ class SlackConfiguration {
                                 .privateMetadata(JsonOps.toJsonString(data))
                                 .blocks(
                                     listOf(
+                                        section { s: SectionBlockBuilder ->
+                                            s
+                                                .text(plainText("The channel we'll post the result"))
+                                                .accessory(conversationsSelect { conv: ConversationsSelectElementBuilder ->
+                                                    conv
+                                                        .responseUrlEnabled(true)
+                                                        .defaultToCurrentConversation(true)
+                                                })
+                                        },
                                         header { it.text(plainText { it.text(question.question) }) },
                                         elements
                                     )
