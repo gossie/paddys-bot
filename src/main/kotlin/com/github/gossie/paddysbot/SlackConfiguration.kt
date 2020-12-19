@@ -1,14 +1,17 @@
 package com.github.gossie.paddysbot
 
+import com.slack.api.app_backend.interactive_components.response.ActionResponse
 import com.slack.api.app_backend.slash_commands.response.SlashCommandResponse
 import com.slack.api.bolt.App
-import com.slack.api.model.block.ActionsBlock
-import com.slack.api.model.block.HeaderBlock
-import com.slack.api.model.block.LayoutBlock
-import com.slack.api.model.block.RichTextBlock
+import com.slack.api.model.block.*
+import com.slack.api.model.block.Blocks.header
+import com.slack.api.model.block.composition.BlockCompositions
+import com.slack.api.model.block.composition.BlockCompositions.plainText
 import com.slack.api.model.block.composition.DispatchActionConfig
 import com.slack.api.model.block.composition.PlainTextObject
 import com.slack.api.model.block.element.*
+import com.slack.api.model.view.Views
+import com.slack.api.model.view.Views.*
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.util.regex.Pattern
@@ -22,10 +25,10 @@ class SlackConfiguration {
         app.command("/echo") { req, ctx -> ctx.ack(req.payload.text) }
         app.command("/question") { _, ctx ->
             val question = questionLoader.determineRandomQuestion()
-
-            when {
+/*
+            val elements = when {
                 question.choices != null -> {
-                    val choiceElements = question.choices
+                    question.choices
                         .map {
                             ButtonElement.builder()
                                 .text(PlainTextObject.builder()
@@ -36,30 +39,36 @@ class SlackConfiguration {
                                 //.url("/choice")
                                 .build()
                         }
-
-                    ctx.ack(
-                        listOf(
-                            HeaderBlock.builder().text(PlainTextObject.builder().text(question.question).build()).build(),
-                            ActionsBlock.builder().elements(choiceElements).build()
-                        )
-                    )
                 }
                 else -> {
-                    val input = listOf(PlainTextInputElement.builder()
+                    listOf(PlainTextInputElement.builder()
                         .actionId("input")
                         .dispatchActionConfig(DispatchActionConfig.builder()
                             .triggerActionsOn(listOf("on_enter_pressed"))
                             .build())
                         .build())
-
-                    ctx.ack(
-                        listOf(
-                            HeaderBlock.builder().text(PlainTextObject.builder().text(question.question).build()).build(),
-                            ActionsBlock.builder().elements(input).build()
-                        )
-                    )
                 }
             }
+*/
+            ctx.client().viewsOpen { builder ->
+                builder.triggerId(ctx.triggerId)
+                    .view(
+                        view { thisView ->
+                            thisView.callbackId("question")
+                                .type("modal")
+                                .title(viewTitle { it.type("plain_text").text(question.question).emoji(true) })
+                                .submit(viewSubmit { it.type("plain_text").text("Submit").emoji(true) })
+                                .close(viewClose { it.type("plain_text").text("Cancel").emoji(true) })
+                                .blocks(
+                                    listOf(
+                                        header { it.text(plainText { it.text(question.question) }) }
+                                    )
+                                )
+                        }
+                    )
+            }
+
+            ctx.ack()
         }
 
         app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
@@ -72,7 +81,7 @@ class SlackConfiguration {
             ctx.ack()
         }
 
-        return app;
+        return app
     }
 
 }
