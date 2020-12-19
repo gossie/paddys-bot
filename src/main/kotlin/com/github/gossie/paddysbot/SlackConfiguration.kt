@@ -88,6 +88,7 @@ class SlackConfiguration {
         }
 
         app.viewSubmission("question") { req, ctx ->
+            ctx.respond("Ist angekommen")
             ctx.ack()
         }
 
