@@ -53,9 +53,9 @@ class SlackConfiguration {
         }
 
         app.viewSubmission("question") { req, ctx ->
-            logger.info("view submission came in: ", req.payload.view.state)
+            logger.info("view submission came in: ", req.payload.view.state.values["input"]?.get("input")?.value)
 
-            ctx.ack { r -> r.responseAction("update").view(ratingView("")) }
+            ctx.ack { r -> r.responseAction("update").view(ratingView(req.payload.view.state.values["input"]?.get("input")?.value)) }
         }
 
         app.viewSubmission("rating") { _, ctx ->
@@ -74,12 +74,14 @@ class SlackConfiguration {
                     input
                         .blockId("input")
                         .element(staticSelect {
-                            it.options(
-                                question.choices
-                                    .map {
-                                        option { oo -> oo.text(plainText(it.choice)).value(it.choice) }
-                                    }
-                            )
+                            it
+                                .options(
+                                    question.choices
+                                        .map {
+                                            option { oo -> oo.text(plainText(it.choice)).value(it.choice) }
+                                        }
+                                )
+                                .actionId("input")
                         })
                         .label(plainText { pt -> pt.text("Deine Antwort") })
 
@@ -110,7 +112,7 @@ class SlackConfiguration {
         }
     }
 
-    private fun ratingView(answer: String): View {
+    private fun ratingView(answer: String?): View {
         return view { thisView ->
             thisView.callbackId("rating")
                 .type("modal")
@@ -119,7 +121,7 @@ class SlackConfiguration {
                 .close(viewClose { it.type("plain_text").text("Schließen").emoji(true) })
                 .blocks(
                     listOf(
-                        header { it.text(plainText { it.text("Hier wird deine Antwort stehen") }) }
+                        header { it.text(plainText { it.text("Hier wird deine Antwort stehen: $answer") }) }
                     )
                 )
         }
