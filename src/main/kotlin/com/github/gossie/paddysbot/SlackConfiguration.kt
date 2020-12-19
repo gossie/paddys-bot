@@ -20,9 +20,7 @@ import org.springframework.context.annotation.Configuration
 
 
 internal class PrivateMetadata {
-    var responseUrl: String? = null
-    var commandArgument: String? = null
-    var channelId: String? = null
+    var question: Question? = null
 }
 
 @Configuration
@@ -58,7 +56,9 @@ class SlackConfiguration {
             val answer = req.payload.view.state.values["input"]?.values?.map { it.value }?.firstOrNull()
                 ?: req.payload.view.state.values["input"]?.values?.map { it.selectedOption }?.map { it.value }?.firstOrNull()
 
-            ctx.ack { r -> r.responseAction("update").view(ratingView(answer)) }
+            val correctAnswer = JsonOps.fromJson(req.payload.view.privateMetadata, PrivateMetadata::class.java).question?.correctAnswer
+
+            ctx.ack { r -> r.responseAction("update").view(ratingView(answer, correctAnswer)) }
         }
 
         app.viewSubmission("rating") { _, ctx ->
@@ -101,12 +101,16 @@ class SlackConfiguration {
             }
         }
 
+        val privateMetadata = PrivateMetadata()
+        privateMetadata.question = question
+
         return view { thisView ->
             thisView.callbackId("question")
                 .type("modal")
                 .title(viewTitle { it.type("plain_text").text("Deine Frage").emoji(true) })
                 .submit(viewSubmit { it.type("plain_text").text("Senden").emoji(true) })
                 .close(viewClose { it.type("plain_text").text("Schließen").emoji(true) })
+                .privateMetadata(JsonOps.toJsonString(privateMetadata))
                 .blocks(
                     listOf(
                         header { it.text(plainText { it.text(question.question) }) },
@@ -116,7 +120,7 @@ class SlackConfiguration {
         }
     }
 
-    private fun ratingView(answer: String?): View {
+    private fun ratingView(answer: String?, correctAnswer: String?): View {
         return view { thisView ->
             thisView.callbackId("rating")
                 .type("modal")
@@ -125,7 +129,7 @@ class SlackConfiguration {
                 .close(viewClose { it.type("plain_text").text("Schließen").emoji(true) })
                 .blocks(
                     listOf(
-                        header { it.text(plainText { it.text("Hier wird deine Antwort stehen: $answer") }) }
+                        header { it.text(plainText { it.text("Die korrekte Antwort ist $correctAnswer und du hast $answer geantwortet.") }) }
                     )
                 )
         }
