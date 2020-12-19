@@ -1,5 +1,7 @@
 package com.github.gossie.paddysbot
 
+import com.slack.api.Slack
+import com.slack.api.app_backend.views.response.InputBlockResponse
 import com.slack.api.bolt.App
 import com.slack.api.bolt.response.Response
 import com.slack.api.bolt.util.JsonOps
@@ -82,15 +84,6 @@ class SlackConfiguration {
                                 .privateMetadata(JsonOps.toJsonString(data))
                                 .blocks(
                                     listOf(
-                                        section { s: SectionBlockBuilder ->
-                                            s
-                                                .text(plainText("The channel we'll post the result"))
-                                                .accessory(channelsSelect { conv ->
-                                                    conv
-                                                        .actionId("notification_conv_id")
-                                                        .responseUrlEnabled(true)
-                                                })
-                                        },
                                         header { it.text(plainText { it.text(question.question) }) },
                                         elements
                                     )
@@ -108,9 +101,10 @@ class SlackConfiguration {
             }
         }
 
-        app.viewSubmission("question") { _, ctx ->
+        app.viewSubmission("question") { req, ctx ->
             logger.info("view submission came in")
-            ctx.respond("Ist angekommen")
+            val privateMetadata = JsonOps.fromJson(req.payload.view.privateMetadata, PrivateMetadata::class.java)
+            Slack.getInstance().send(privateMetadata.responseUrl, "Ist angekomment")
             ctx.ack()
         }
 
