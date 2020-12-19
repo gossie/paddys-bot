@@ -31,6 +31,7 @@ class SlackConfiguration {
                                     .text(it.choice)
                                     .build())
                                 .actionId("choice-${it.id}")
+                                .value(it.choice)
                                 //.url("/choice")
                                 .build()
                         }
@@ -42,11 +43,26 @@ class SlackConfiguration {
                         )
                     )
                 }
-                else -> ctx.ack(question.question)
+                else -> {
+                    val input = PlainTextInputElement.builder()
+                        .actionId("input")
+                        .build()
+
+                    ctx.ack(
+                        listOf(
+                            HeaderBlock.builder().text(PlainTextObject.builder().text(question.question).build()).build(),
+                            ActionsBlock.builder().elements(input).build()
+                        )
+                }
             }
         }
 
         app.blockAction(Pattern.compile("choice-\\w+-\\w+-\\w+-\\w+-\\w+")) { req, ctx ->
+            ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
+            ctx.ack()
+        }
+
+        app.blockAction("input") { req, ctx ->
             ctx.respond("Deine Antwort war ${req.payload.actions[0].value}")
             ctx.ack()
         }
