@@ -3,6 +3,7 @@ package com.github.gossie.paddysbot
 import com.slack.api.app_backend.slash_commands.response.SlashCommandResponse
 import com.slack.api.bolt.App
 import com.slack.api.model.block.ActionsBlock
+import com.slack.api.model.block.HeaderBlock
 import com.slack.api.model.block.LayoutBlock
 import com.slack.api.model.block.RichTextBlock
 import com.slack.api.model.block.composition.PlainTextObject
@@ -33,30 +34,7 @@ class SlackConfiguration {
 
                     ctx.ack(
                         listOf(
-                            RichTextBlock
-                                .builder()
-                                .elements(
-                                    listOf(
-                                        BlockElements
-                                            .richTextSection {
-                                                it.elements(
-                                                    listOf(RichTextSectionElement
-                                                        .builder()
-                                                        .elements(
-                                                            listOf(
-                                                                RichTextSectionElement.Text
-                                                                    .builder()
-                                                                    .text(question.question)
-                                                                    .build()
-                                                            )
-                                                        )
-                                                        .build()
-                                                    )
-                                                )
-                                            }
-                                    )
-                                )
-                                .build(),
+                            HeaderBlock.builder().text(PlainTextObject.builder().text(question.question).build()).build(),
                             ActionsBlock.builder().elements(choiceElements).build()
                         )
                     )
