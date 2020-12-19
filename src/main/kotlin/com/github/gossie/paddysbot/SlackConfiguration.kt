@@ -56,6 +56,7 @@ class SlackConfiguration {
             logger.info("question view submission came in")
 
             val answer = req.payload.view.state.values["input"]?.values?.map { it.value }?.firstOrNull()
+                ?: req.payload.view.state.values["input"]?.values?.map { it.selectedOption }?.map { it.value }?.firstOrNull()
 
             ctx.ack { r -> r.responseAction("update").view(ratingView(answer)) }
         }
