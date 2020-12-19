@@ -30,7 +30,7 @@ class SlackConfiguration {
                                     .text(it.choice)
                                     .build())
                                 .actionId(it.id.toString())
-                                .url("/choice")
+                                //.url("/choice")
                                 .build()
                         }
 
