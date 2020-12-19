@@ -11,5 +11,6 @@ data class Question(
 )
 
 data class Choice(
+    @JsonProperty("id") val id: UUID,
     @JsonProperty("choice") val choice: String
 )

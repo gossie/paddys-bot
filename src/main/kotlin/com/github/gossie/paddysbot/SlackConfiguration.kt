@@ -29,6 +29,8 @@ class SlackConfiguration {
                                 .text(PlainTextObject.builder()
                                     .text(it.choice)
                                     .build())
+                                .actionId(it.id.toString())
+                                .url("/choice")
                                 .build()
                         }
 
