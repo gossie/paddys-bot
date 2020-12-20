@@ -84,9 +84,7 @@ class SlackConfiguration {
                                             option { oo -> oo.text(plainText(it.choice)).value(it.choice) }
                                         }
                                 )
-                                .actionId("input")
                         })
-                        .dispatchAction(true)
                         .label(plainText { pt -> pt.text("Deine Antwort") })
 
                 }
